@@ -1,0 +1,10 @@
+version set true
+valid true invalid false
+caseless true
+first 'beans' at 3..8
+words 3
+kv retries -> 5 (of 3)
+optional group empty true
+unicode true digits false
+bad pattern refused invalid
+matching ok

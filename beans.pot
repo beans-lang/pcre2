@@ -1,0 +1,38 @@
+module pcre2
+kind library
+
+# Every pcre2 translation unit, exactly upstream's non-autotools set:
+# one wrapper per source so the shared prelude states the build choices
+# and the vendored tree stays pristine (three documented renames:
+# config.h, pcre2.h, pcre2_chartables.c — see vendor/VENDOR.md).
+csrc all "src/beans_auto_possess.c"
+csrc all "src/beans_chartables.c"
+csrc all "src/beans_chkdint.c"
+csrc all "src/beans_compile_cgroup.c"
+csrc all "src/beans_compile_class.c"
+csrc all "src/beans_compile.c"
+csrc all "src/beans_config.c"
+csrc all "src/beans_context.c"
+csrc all "src/beans_convert.c"
+csrc all "src/beans_dfa_match.c"
+csrc all "src/beans_error.c"
+csrc all "src/beans_extuni.c"
+csrc all "src/beans_find_bracket.c"
+csrc all "src/beans_jit_compile.c"
+csrc all "src/beans_maketables.c"
+csrc all "src/beans_match_data.c"
+csrc all "src/beans_match_next.c"
+csrc all "src/beans_match.c"
+csrc all "src/beans_newline.c"
+csrc all "src/beans_ord2utf.c"
+csrc all "src/beans_pattern_info.c"
+csrc all "src/beans_script_run.c"
+csrc all "src/beans_serialize.c"
+csrc all "src/beans_string_utils.c"
+csrc all "src/beans_study.c"
+csrc all "src/beans_substitute.c"
+csrc all "src/beans_substring.c"
+csrc all "src/beans_tables.c"
+csrc all "src/beans_ucd.c"
+csrc all "src/beans_valid_utf.c"
+csrc all "src/beans_xclass.c"
