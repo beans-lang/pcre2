@@ -1,0 +1,56 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+          - os: ubuntu-latest
+          - os: ubuntu-24.04-arm
+          - os: windows-latest
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Beans
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            # The 0.1.28 installer unpacks the Windows .zip with tar -xz,
+            # which Git Bash's GNU tar refuses; fetch and unzip directly
+            # until a release ships the installer fix.
+            url=$(gh api repos/beans-lang/beans/releases/latest \
+              -q '.assets[] | select(.name | endswith("x86_64-pc-windows-gnullvm.zip")) | .browser_download_url')
+            curl -fsSL -o /tmp/beans.zip "$url"
+            unzip -q /tmp/beans.zip -d "$HOME/beans-dist"
+            chmod +x "$HOME"/beans-dist/*/bin/* "$HOME"/beans-dist/*/toolchain/bin/* 2>/dev/null || true
+            echo "$HOME"/beans-dist/*/bin >> "$GITHUB_PATH"
+            # The Windows package launcher is beansc.cmd; bash has no
+            # PATHEXT, so hand test.sh the exact file.
+            echo "BEANSC=$(echo "$HOME"/beans-dist/*/bin/beansc.cmd)" >> "$GITHUB_ENV"
+          else
+            curl -fsSL https://github.com/beans-lang/beans/releases/latest/download/beans-install.sh | sh
+            echo "$HOME/.beans/bin" >> "$GITHUB_PATH"
+          fi
+
+      - name: Toolchain versions
+        run: |
+          "${BEANSC:-beansc}" --version
+          clang --version | head -1
+
+      - name: Vendor integrity
+        run: test -f vendor/pcre2/src/pcre2.h && grep -q "10.47" vendor/VENDOR.md
+
+      - name: Test (interpreter, example, target checks, native)
+        run: ./test.sh --native
